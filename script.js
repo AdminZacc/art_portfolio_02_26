@@ -500,6 +500,8 @@ document.addEventListener("keydown", (event) => {
 const setTheme = (theme) => {
   const isLight = theme === "light";
   document.body.classList.toggle("light", isLight);
+  document.body.setAttribute("data-theme", theme);
+  document.documentElement.setAttribute("data-theme", theme);
   if (themeToggle) {
     themeToggle.textContent = isLight ? "Dark mode" : "Light mode";
     themeToggle.setAttribute("aria-pressed", String(isLight));
@@ -507,8 +509,24 @@ const setTheme = (theme) => {
   }
 };
 
+const readStoredTheme = () => {
+  try {
+    return window.localStorage.getItem("portfolio-theme");
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredTheme = (theme) => {
+  try {
+    window.localStorage.setItem("portfolio-theme", theme);
+  } catch {
+    return;
+  }
+};
+
 const initializeTheme = () => {
-  const storedTheme = window.localStorage.getItem("portfolio-theme");
+  const storedTheme = readStoredTheme();
   const preferredDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const initialTheme = storedTheme || (preferredDark ? "dark" : "light");
   setTheme(initialTheme);
@@ -518,7 +536,7 @@ if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
     setTheme(nextTheme);
-    window.localStorage.setItem("portfolio-theme", nextTheme);
+    writeStoredTheme(nextTheme);
   });
 }
 

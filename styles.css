@@ -132,6 +132,10 @@ body.light {
   background: #f4f6fb;
 }
 
+html[data-theme="light"] body {
+  background: #f4f6fb;
+}
+
 body.light #bg-animation {
   opacity: 0.2;
 }
@@ -195,6 +199,44 @@ body.light .top-nav a[aria-current="page"] {
 body.light .carousel-modal,
 body.light .blog-modal {
   background: rgba(236, 241, 250, 0.95);
+}
+
+html[data-theme="light"] .logo-mark,
+html[data-theme="light"] .about-section,
+html[data-theme="light"] .blog-card,
+html[data-theme="light"] .blog-modal-content,
+html[data-theme="light"] .featured-item,
+html[data-theme="light"] .carousel-nav,
+html[data-theme="light"] .carousel-close,
+html[data-theme="light"] .blog-modal-close,
+html[data-theme="light"] .theme-toggle {
+  background: #ffffff;
+  border-color: #cfd7e6;
+  color: #1f2a3d;
+}
+
+html[data-theme="light"] .top-nav a,
+html[data-theme="light"] .about-section,
+html[data-theme="light"] .blog-card p,
+html[data-theme="light"] .blog-modal-content p,
+html[data-theme="light"] .footer-content p,
+html[data-theme="light"] .credit,
+html[data-theme="light"] .blog-date,
+html[data-theme="light"] .blog-modal-date,
+html[data-theme="light"] .carousel-caption,
+html[data-theme="light"] .footer-content a {
+  color: #3a475f;
+}
+
+html[data-theme="light"] .logo-text,
+html[data-theme="light"] h1,
+html[data-theme="light"] .about-section h2,
+html[data-theme="light"] .featured-section h2,
+html[data-theme="light"] .blog-section h2,
+html[data-theme="light"] .blog-card h3,
+html[data-theme="light"] .blog-modal-content h3,
+html[data-theme="light"] .footer-content h3 {
+  color: #1f2a3d;
 }
 
 .container {
