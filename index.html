@@ -98,7 +98,7 @@
       <section class="blog-section" aria-labelledby="blog-title">
         <h2 id="blog-title">Blog</h2>
         <div class="blog-grid">
-          <article class="blog-card">
+          <article class="blog-card" data-post="atmosphere-contrast" role="button" tabindex="0" aria-label="Open post: Building Atmosphere Through Contrast">
             <p class="blog-date">February 2026</p>
             <h3>Building Atmosphere Through Contrast</h3>
             <p>
@@ -106,7 +106,7 @@
               pieces.
             </p>
           </article>
-          <article class="blog-card">
+          <article class="blog-card" data-post="sketch-to-texture" role="button" tabindex="0" aria-label="Open post: From Sketch to Final Texture">
             <p class="blog-date">January 2026</p>
             <h3>From Sketch to Final Texture</h3>
             <p>
@@ -114,7 +114,7 @@
               preserves motion.
             </p>
           </article>
-          <article class="blog-card">
+          <article class="blog-card" data-post="commission-workflow" role="button" tabindex="0" aria-label="Open post: Commission Workflow Update">
             <p class="blog-date">December 2025</p>
             <h3>Commission Workflow Update</h3>
             <p>
@@ -133,6 +133,15 @@
         <figcaption class="carousel-caption" id="carousel-caption"></figcaption>
       </figure>
       <button class="carousel-nav carousel-next" id="carousel-next" type="button" aria-label="Next image">›</button>
+    </div>
+
+    <div class="blog-modal" id="blog-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="blog-modal-title">
+      <button class="blog-modal-close" id="blog-modal-close" type="button" aria-label="Close post">×</button>
+      <article class="blog-modal-content">
+        <p class="blog-modal-date" id="blog-modal-date"></p>
+        <h3 id="blog-modal-title"></h3>
+        <p id="blog-modal-body"></p>
+      </article>
     </div>
 
     <footer class="site-footer" id="contact">

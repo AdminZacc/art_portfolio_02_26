@@ -132,6 +132,12 @@ const carouselCaption = document.getElementById("carousel-caption");
 const carouselClose = document.getElementById("carousel-close");
 const carouselPrev = document.getElementById("carousel-prev");
 const carouselNext = document.getElementById("carousel-next");
+const blogCards = Array.from(document.querySelectorAll(".blog-card[data-post]"));
+const blogModal = document.getElementById("blog-modal");
+const blogModalClose = document.getElementById("blog-modal-close");
+const blogModalDate = document.getElementById("blog-modal-date");
+const blogModalTitle = document.getElementById("blog-modal-title");
+const blogModalBody = document.getElementById("blog-modal-body");
 
 let carouselFiles = [];
 let carouselIndex = 0;
@@ -140,6 +146,25 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
+let lastFocusedBlogCard = null;
+
+const blogPosts = {
+  "atmosphere-contrast": {
+    date: "February 2026",
+    title: "Building Atmosphere Through Contrast",
+    body: "Contrast is one of the fastest ways to create emotional direction. I usually begin by defining a dominant dark or light zone, then introduce a counterweight that pulls the eye across the composition. Negative space keeps that movement readable and gives texture room to breathe. When the contrast balance is right, the image feels active even when the subject is still.",
+  },
+  "sketch-to-texture": {
+    date: "January 2026",
+    title: "From Sketch to Final Texture",
+    body: "I start with loose value sketches to test composition before detail. Once the structure is strong, I build texture in passes: broad grain first, then selective edges and micro-contrast. The final color pass is where cohesion happens. I trim back anything that competes with the focal rhythm so the finished piece keeps its momentum.",
+  },
+  "commission-workflow": {
+    date: "December 2025",
+    title: "Commission Workflow Update",
+    body: "Commissions run in clear phases: concept alignment, composition draft, texture and color development, and final polish. Each phase has a feedback checkpoint so decisions stay intentional and on schedule. This keeps revisions focused and protects the visual language of the piece while still giving room for collaboration.",
+  },
+};
 
 const shuffle = (array) => {
   const result = [...array];
@@ -240,6 +265,40 @@ const closeCarousel = () => {
   }
 };
 
+const openBlogModal = (postId, sourceCard) => {
+  const post = blogPosts[postId];
+  if (!post || !blogModal || !blogModalDate || !blogModalTitle || !blogModalBody) {
+    return;
+  }
+
+  lastFocusedBlogCard = sourceCard;
+  blogModalDate.textContent = post.date;
+  blogModalTitle.textContent = post.title;
+  blogModalBody.textContent = post.body;
+  blogModal.classList.add("is-open");
+  blogModal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  if (blogModalClose) {
+    blogModalClose.focus();
+  }
+};
+
+const closeBlogModal = () => {
+  if (!blogModal || !blogModalDate || !blogModalTitle || !blogModalBody) {
+    return;
+  }
+
+  blogModal.classList.remove("is-open");
+  blogModal.setAttribute("aria-hidden", "true");
+  blogModalDate.textContent = "";
+  blogModalTitle.textContent = "";
+  blogModalBody.textContent = "";
+  document.body.style.overflow = "";
+  if (lastFocusedBlogCard) {
+    lastFocusedBlogCard.focus();
+  }
+};
+
 const showPrevious = () => {
   if (!carouselFiles.length) {
     return;
@@ -298,15 +357,46 @@ galleryItems.forEach((item) => {
   });
 });
 
+blogCards.forEach((card) => {
+  const postId = card.dataset.post;
+  if (!postId) {
+    return;
+  }
+
+  const openFromCard = () => {
+    openBlogModal(postId, card);
+  };
+
+  card.addEventListener("click", openFromCard);
+  card.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openFromCard();
+    }
+  });
+});
+
 carouselClose.addEventListener("click", closeCarousel);
 carouselPrev.addEventListener("click", showPrevious);
 carouselNext.addEventListener("click", showNext);
+
+if (blogModalClose) {
+  blogModalClose.addEventListener("click", closeBlogModal);
+}
 
 carouselModal.addEventListener("click", (event) => {
   if (event.target === carouselModal) {
     closeCarousel();
   }
 });
+
+if (blogModal) {
+  blogModal.addEventListener("click", (event) => {
+    if (event.target === blogModal) {
+      closeBlogModal();
+    }
+  });
+}
 
 carouselImage.addEventListener(
   "touchstart",
@@ -338,21 +428,29 @@ carouselImage.addEventListener("touchend", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (!carouselModal.classList.contains("is-open")) {
-    return;
-  }
+  const isCarouselOpen = carouselModal.classList.contains("is-open");
+  const isBlogOpen = blogModal ? blogModal.classList.contains("is-open") : false;
 
   if (event.key === "Escape") {
-    closeCarousel();
+    if (isCarouselOpen) {
+      closeCarousel();
+      return;
+    }
+
+    if (isBlogOpen) {
+      closeBlogModal();
+    }
     return;
   }
 
-  if (event.key === "ArrowLeft") {
-    showPrevious();
-    return;
-  }
+  if (isCarouselOpen) {
+    if (event.key === "ArrowLeft") {
+      showPrevious();
+      return;
+    }
 
-  if (event.key === "ArrowRight") {
-    showNext();
+    if (event.key === "ArrowRight") {
+      showNext();
+    }
   }
 });

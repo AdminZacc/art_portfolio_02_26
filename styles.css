@@ -158,6 +158,18 @@ h1 {
   border: 1px solid #2b3445;
   border-radius: 12px;
   background: #161a22;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.blog-card:hover {
+  border-color: #3b4960;
+  background: #1a202b;
+}
+
+.blog-card:focus-visible {
+  outline: 2px solid #e6ebf2;
+  outline-offset: 2px;
 }
 
 .blog-date {
@@ -178,6 +190,75 @@ h1 {
   margin: 0;
   color: #c8d1df;
   font: 400 14px/1.6 "Inter", Arial, sans-serif;
+}
+
+.blog-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(16, 18, 23, 0.92);
+  z-index: 1100;
+}
+
+.blog-modal.is-open {
+  display: flex;
+}
+
+.blog-modal-content {
+  width: min(760px, 94vw);
+  margin: 0;
+  padding: 28px;
+  border: 1px solid #2b3445;
+  border-radius: 12px;
+  background: #161a22;
+}
+
+.blog-modal-date {
+  margin: 0 0 10px;
+  color: #a9b4c8;
+  font: 500 12px/1 "Inter", Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.blog-modal-content h3 {
+  margin: 0 0 14px;
+  color: #e6ebf2;
+  font: 600 28px/1.2 "Oswald", "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.blog-modal-content p {
+  margin: 0;
+  color: #c8d1df;
+  font: 400 15px/1.8 "Inter", Arial, sans-serif;
+}
+
+.blog-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #36435a;
+  background: #161a22;
+  color: #e6ebf2;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.blog-modal-close:hover {
+  background: #202838;
 }
 
 .item {
@@ -443,6 +524,18 @@ h1 {
 
   .blog-card {
     padding: 16px;
+  }
+
+  .blog-modal {
+    padding: 14px;
+  }
+
+  .blog-modal-content {
+    padding: 20px;
+  }
+
+  .blog-modal-content h3 {
+    font-size: 22px;
   }
 
   .footer-content {
