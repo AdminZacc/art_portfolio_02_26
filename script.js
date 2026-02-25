@@ -150,6 +150,8 @@ const blogModalTitle = document.getElementById("blog-modal-title");
 const blogModalBody = document.getElementById("blog-modal-body");
 const themeToggle = document.getElementById("theme-toggle");
 const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'));
+const shaderCanvas = document.getElementById("shader-canvas");
+const shaderStage = document.getElementById("shader-stage");
 
 let carouselFiles = [];
 let carouselIndex = 0;
@@ -497,6 +499,159 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+const initShaderLab = () => {
+  if (!shaderCanvas) {
+    return;
+  }
+
+  const gl = shaderCanvas.getContext("webgl", { alpha: false, antialias: true });
+  if (!gl) {
+    if (shaderStage) {
+      shaderStage.classList.add("is-fallback");
+    }
+    return;
+  }
+
+  const vertexSource = `
+    attribute vec2 a_position;
+    void main() {
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+  `;
+
+  const fragmentSource = `
+    precision mediump float;
+    uniform vec2 u_resolution;
+    uniform float u_time;
+    uniform float u_theme;
+
+    void main() {
+      vec2 uv = (gl_FragCoord.xy / u_resolution.xy) * 2.0 - 1.0;
+      uv.x *= u_resolution.x / u_resolution.y;
+
+      float time = u_time * 0.42;
+      float rings = sin(length(uv) * 12.0 - time * 3.0);
+      float waves = sin((uv.x * 4.2 + time) + sin(uv.y * 6.0 - time * 1.8));
+      float pulse = sin(time * 2.5 + length(uv) * 9.0);
+      float glow = 0.5 + 0.5 * (rings * 0.55 + waves * 0.3 + pulse * 0.25);
+
+      vec3 darkA = vec3(0.06, 0.10, 0.22);
+      vec3 darkB = vec3(0.62, 0.35, 0.84);
+      vec3 darkC = vec3(0.10, 0.72, 0.88);
+
+      vec3 lightA = vec3(0.84, 0.90, 1.00);
+      vec3 lightB = vec3(0.50, 0.66, 0.95);
+      vec3 lightC = vec3(0.89, 0.60, 0.93);
+
+      vec3 paletteA = mix(darkA, lightA, u_theme);
+      vec3 paletteB = mix(darkB, lightB, u_theme);
+      vec3 paletteC = mix(darkC, lightC, u_theme);
+
+      vec3 color = mix(paletteA, paletteB, glow);
+      color = mix(color, paletteC, 0.5 + 0.5 * sin(time + uv.y * 5.0));
+
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
+
+  const compileShader = (type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) {
+      return null;
+    }
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  };
+
+  const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+  if (!vertexShader || !fragmentShader) {
+    if (shaderStage) {
+      shaderStage.classList.add("is-fallback");
+    }
+    return;
+  }
+
+  const program = gl.createProgram();
+  if (!program) {
+    if (shaderStage) {
+      shaderStage.classList.add("is-fallback");
+    }
+    return;
+  }
+
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    if (shaderStage) {
+      shaderStage.classList.add("is-fallback");
+    }
+    return;
+  }
+
+  const positionLocation = gl.getAttribLocation(program, "a_position");
+  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+  const timeLocation = gl.getUniformLocation(program, "u_time");
+  const themeLocation = gl.getUniformLocation(program, "u_theme");
+
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+    gl.STATIC_DRAW,
+  );
+
+  const resizeCanvas = () => {
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.floor(shaderCanvas.clientWidth * dpr);
+    const height = Math.floor(shaderCanvas.clientHeight * dpr);
+    if (shaderCanvas.width !== width || shaderCanvas.height !== height) {
+      shaderCanvas.width = width;
+      shaderCanvas.height = height;
+      gl.viewport(0, 0, width, height);
+    }
+  };
+
+  const render = (elapsedMs) => {
+    resizeCanvas();
+    const timeSeconds = elapsedMs * 0.001;
+    const isLightTheme = document.body.classList.contains("light") ? 1 : 0;
+
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform2f(resolutionLocation, shaderCanvas.width, shaderCanvas.height);
+    gl.uniform1f(timeLocation, timeSeconds);
+    gl.uniform1f(themeLocation, isLightTheme);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  };
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    render(0);
+    window.addEventListener("resize", () => render(0));
+    return;
+  }
+
+  const loop = (elapsedMs) => {
+    render(elapsedMs);
+    window.requestAnimationFrame(loop);
+  };
+
+  window.addEventListener("resize", resizeCanvas);
+  window.requestAnimationFrame(loop);
+};
+
 const setTheme = (theme) => {
   const isLight = theme === "light";
   document.body.classList.toggle("light", isLight);
@@ -541,6 +696,7 @@ if (themeToggle) {
 }
 
 initializeTheme();
+initShaderLab();
 
 const setCurrentNavLink = (targetId) => {
   navLinks.forEach((link) => {
