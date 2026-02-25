@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div id="bg-animation" aria-hidden="true"></div>
 
     <header class="site-header">
@@ -35,13 +36,15 @@
       </div>
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#gallery-title">Gallery</a>
+        <a href="#featured-title">Featured</a>
         <a href="#about-title">About</a>
         <a href="#blog-title">Blog</a>
         <a href="#contact">Contact</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to light theme">Light mode</button>
       </nav>
     </header>
 
-    <div class="container">
+    <main class="container" id="main-content">
       <h1 id="gallery-title">Gallery</h1>
 
       <div class="gallery-wrap">
@@ -84,6 +87,18 @@
         <div class="item item-25" aria-label="Gallery image 25"></div>
       </div>
 
+      <section class="featured-section" aria-labelledby="featured-title">
+        <h2 id="featured-title">Featured Murals</h2>
+        <div class="featured-grid">
+          <div class="featured-item" aria-label="Featured mural image 1"></div>
+          <div class="featured-item" aria-label="Featured mural image 2"></div>
+          <div class="featured-item" aria-label="Featured mural image 3"></div>
+          <div class="featured-item" aria-label="Featured mural image 4"></div>
+          <div class="featured-item" aria-label="Featured mural image 5"></div>
+          <div class="featured-item" aria-label="Featured mural image 6"></div>
+        </div>
+      </section>
+
       <section class="about-section" aria-labelledby="about-title">
         <h2 id="about-title">About</h2>
         <p>
@@ -123,7 +138,7 @@
           </article>
         </div>
       </section>
-    </div>
+    </main>
 
     <div class="carousel-modal" id="carousel-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image carousel">
       <button class="carousel-close" id="carousel-close" type="button" aria-label="Close gallery">×</button>

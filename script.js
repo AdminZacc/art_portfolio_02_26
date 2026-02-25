@@ -26,6 +26,15 @@ const imageFiles = [
   "images/IMG_2603.jpg",
 ];
 
+const featuredMuralFiles = [
+  "images/IMG_0236.PNG",
+  "images/IMG_1038.PNG",
+  "images/IMG_1719.PNG",
+  "images/IMG_2068.PNG",
+  "images/IMG_2079.PNG",
+  "images/IMG_3979.PNG",
+];
+
 const artworkMeta = {
   "images/IMG_0236.PNG": { title: "Ember Pulse", year: "2024", medium: "Digital" },
   "images/IMG_1038.PNG": { title: "Midnight Window", year: "2024", medium: "Digital" },
@@ -126,6 +135,7 @@ initBackgroundAnimation().catch(() => {
 });
 
 const galleryItems = Array.from(document.querySelectorAll(".gallery-wrap .item"));
+const featuredItems = Array.from(document.querySelectorAll(".featured-grid .featured-item"));
 const carouselModal = document.getElementById("carousel-modal");
 const carouselImage = document.getElementById("carousel-image");
 const carouselCaption = document.getElementById("carousel-caption");
@@ -138,6 +148,7 @@ const blogModalClose = document.getElementById("blog-modal-close");
 const blogModalDate = document.getElementById("blog-modal-date");
 const blogModalTitle = document.getElementById("blog-modal-title");
 const blogModalBody = document.getElementById("blog-modal-body");
+const themeToggle = document.getElementById("theme-toggle");
 
 let carouselFiles = [];
 let carouselIndex = 0;
@@ -219,9 +230,34 @@ const assignUniqueImages = () => {
   });
 };
 
-assignUniqueImages();
+const assignFeaturedImages = () => {
+  featuredItems.forEach((item, index) => {
+    const fileName = featuredMuralFiles[index];
 
-const getCarouselFiles = () => galleryItems.map((item) => item.dataset.fileName).filter(Boolean);
+    if (fileName) {
+      const metadata = getArtworkMeta(fileName);
+      item.style.backgroundImage = `url("${fileName}")`;
+      item.classList.remove("is-empty");
+      item.dataset.fileName = fileName;
+      item.setAttribute("role", "button");
+      item.setAttribute("tabindex", "0");
+      item.setAttribute("aria-label", `Featured mural ${index + 1}: ${metadata.title}`);
+      return;
+    }
+
+    item.style.backgroundImage = "none";
+    item.classList.add("is-empty");
+    delete item.dataset.fileName;
+    item.removeAttribute("role");
+    item.removeAttribute("tabindex");
+    item.setAttribute("aria-label", `Featured mural slot ${index + 1} (empty)`);
+  });
+};
+
+assignUniqueImages();
+assignFeaturedImages();
+
+const getCarouselFiles = () => [...featuredItems, ...galleryItems].map((item) => item.dataset.fileName).filter(Boolean);
 
 const updateCarouselView = () => {
   const currentFile = carouselFiles[carouselIndex];
@@ -332,30 +368,35 @@ const handleSwipe = () => {
   showPrevious();
 };
 
-galleryItems.forEach((item) => {
-  const openFromItem = () => {
-    const fileName = item.dataset.fileName;
-    if (!fileName) {
-      return;
-    }
+const addCarouselInteraction = (items) => {
+  items.forEach((item) => {
+    const openFromItem = () => {
+      const fileName = item.dataset.fileName;
+      if (!fileName) {
+        return;
+      }
 
-    const files = getCarouselFiles();
-    const startIndex = files.indexOf(fileName);
-    if (startIndex < 0) {
-      return;
-    }
+      const files = getCarouselFiles();
+      const startIndex = files.indexOf(fileName);
+      if (startIndex < 0) {
+        return;
+      }
 
-    openCarousel(startIndex, item);
-  };
+      openCarousel(startIndex, item);
+    };
 
-  item.addEventListener("click", openFromItem);
-  item.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openFromItem();
-    }
+    item.addEventListener("click", openFromItem);
+    item.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openFromItem();
+      }
+    });
   });
-});
+};
+
+addCarouselInteraction(galleryItems);
+addCarouselInteraction(featuredItems);
 
 blogCards.forEach((card) => {
   const postId = card.dataset.post;
@@ -454,3 +495,30 @@ document.addEventListener("keydown", (event) => {
     }
   }
 });
+
+const setTheme = (theme) => {
+  const isLight = theme === "light";
+  document.body.classList.toggle("light", isLight);
+  if (themeToggle) {
+    themeToggle.textContent = isLight ? "Dark mode" : "Light mode";
+    themeToggle.setAttribute("aria-pressed", String(isLight));
+    themeToggle.setAttribute("aria-label", isLight ? "Switch to dark theme" : "Switch to light theme");
+  }
+};
+
+const initializeTheme = () => {
+  const storedTheme = window.localStorage.getItem("portfolio-theme");
+  const preferredDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initialTheme = storedTheme || (preferredDark ? "dark" : "light");
+  setTheme(initialTheme);
+};
+
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
+    setTheme(nextTheme);
+    window.localStorage.setItem("portfolio-theme", nextTheme);
+  });
+}
+
+initializeTheme();

@@ -9,6 +9,24 @@ body {
   background: #101217;
 }
 
+.skip-link {
+  position: absolute;
+  left: 10px;
+  top: -40px;
+  z-index: 2000;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #202838;
+  color: #e6ebf2;
+  border: 1px solid #36435a;
+  font: 600 12px/1 "Inter", Arial, sans-serif;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 10px;
+}
+
 #bg-animation {
   position: fixed;
   inset: 0;
@@ -61,6 +79,7 @@ body {
 
 .top-nav {
   display: flex;
+  align-items: center;
   gap: 18px;
 }
 
@@ -74,6 +93,98 @@ body {
 
 .top-nav a:hover {
   color: #e6ebf2;
+}
+
+.top-nav a:focus-visible,
+.theme-toggle:focus-visible,
+.carousel-nav:focus-visible,
+.carousel-close:focus-visible,
+.blog-modal-close:focus-visible,
+.footer-content a:focus-visible {
+  outline: 2px solid #e6ebf2;
+  outline-offset: 3px;
+}
+
+.theme-toggle {
+  margin-left: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #36435a;
+  background: #161a22;
+  color: #e6ebf2;
+  font: 600 11px/1 "Inter", Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: #202838;
+}
+
+body.light {
+  background: #f4f6fb;
+}
+
+body.light #bg-animation {
+  opacity: 0.2;
+}
+
+body.light .logo-mark,
+body.light .about-section,
+body.light .blog-card,
+body.light .blog-modal-content,
+body.light .featured-item,
+body.light .carousel-nav,
+body.light .carousel-close,
+body.light .blog-modal-close,
+body.light .theme-toggle {
+  background: #ffffff;
+  border-color: #cfd7e6;
+  color: #1f2a3d;
+}
+
+body.light .site-footer {
+  border-top-color: #cfd7e6;
+}
+
+body.light .item.is-empty,
+body.light .featured-item.is-empty {
+  background: #e7edf7;
+}
+
+body.light .logo-text,
+body.light h1,
+body.light .about-section h2,
+body.light .featured-section h2,
+body.light .blog-section h2,
+body.light .blog-card h3,
+body.light .blog-modal-content h3,
+body.light .footer-content h3 {
+  color: #1f2a3d;
+}
+
+body.light .top-nav a,
+body.light .about-section,
+body.light .blog-card p,
+body.light .blog-modal-content p,
+body.light .footer-content p,
+body.light .credit,
+body.light .blog-date,
+body.light .blog-modal-date,
+body.light .carousel-caption,
+body.light .footer-content a {
+  color: #3a475f;
+}
+
+body.light .top-nav a:hover,
+body.light .footer-content a:hover {
+  color: #1f2a3d;
+}
+
+body.light .carousel-modal,
+body.light .blog-modal {
+  background: rgba(236, 241, 250, 0.95);
 }
 
 .container {
@@ -104,6 +215,46 @@ h1 {
 
 .gallery-wrap + .gallery-wrap {
   margin-top: 16px;
+}
+
+.featured-section {
+  margin-top: 16px;
+}
+
+.featured-section h2 {
+  margin: 0 0 14px;
+  font-family: "Oswald", "Arial Narrow", Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #e6ebf2;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.featured-item {
+  min-height: 220px;
+  border-radius: 12px;
+  border: 1px solid #2b3445;
+  background: #161a22;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.featured-item:focus-visible {
+  outline: 2px solid #e6ebf2;
+  outline-offset: 2px;
+}
+
+.featured-item.is-empty {
+  cursor: default;
+  background: #1a1f2b;
 }
 
 .about-section {
@@ -490,6 +641,10 @@ h1 {
     gap: 12px;
   }
 
+  .theme-toggle {
+    margin-left: 0;
+  }
+
   .container {
     padding: 24px 0 36px;
     width: 94vw;
@@ -512,6 +667,18 @@ h1 {
 
   .about-section h2 {
     font-size: 22px;
+  }
+
+  .featured-section h2 {
+    font-size: 22px;
+  }
+
+  .featured-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured-item {
+    min-height: 160px;
   }
 
   .blog-section h2 {
