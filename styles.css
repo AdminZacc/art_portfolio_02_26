@@ -95,6 +95,12 @@ body {
   color: #e6ebf2;
 }
 
+.top-nav a[aria-current="page"] {
+  color: #e6ebf2;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .top-nav a:focus-visible,
 .theme-toggle:focus-visible,
 .carousel-nav:focus-visible,
@@ -179,6 +185,10 @@ body.light .footer-content a {
 
 body.light .top-nav a:hover,
 body.light .footer-content a:hover {
+  color: #1f2a3d;
+}
+
+body.light .top-nav a[aria-current="page"] {
   color: #1f2a3d;
 }
 

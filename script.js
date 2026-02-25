@@ -149,6 +149,7 @@ const blogModalDate = document.getElementById("blog-modal-date");
 const blogModalTitle = document.getElementById("blog-modal-title");
 const blogModalBody = document.getElementById("blog-modal-body");
 const themeToggle = document.getElementById("theme-toggle");
+const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'));
 
 let carouselFiles = [];
 let carouselIndex = 0;
@@ -522,3 +523,81 @@ if (themeToggle) {
 }
 
 initializeTheme();
+
+const setCurrentNavLink = (targetId) => {
+  navLinks.forEach((link) => {
+    const isCurrent = link.getAttribute("href") === `#${targetId}`;
+    if (isCurrent) {
+      link.setAttribute("aria-current", "page");
+      return;
+    }
+    link.removeAttribute("aria-current");
+  });
+};
+
+const initSectionTracking = () => {
+  if (!navLinks.length) {
+    return;
+  }
+
+  const sectionMap = navLinks
+    .map((link) => {
+      const hash = link.getAttribute("href");
+      if (!hash) {
+        return null;
+      }
+
+      const section = document.querySelector(hash);
+      if (!section || !section.id) {
+        return null;
+      }
+
+      return {
+        id: section.id,
+        element: section,
+      };
+    })
+    .filter(Boolean);
+
+  if (!sectionMap.length) {
+    return;
+  }
+
+  let activeId = sectionMap[0].id;
+  setCurrentNavLink(activeId);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        activeId = entry.target.id;
+      });
+
+      setCurrentNavLink(activeId);
+    },
+    {
+      root: null,
+      rootMargin: "-35% 0px -55% 0px",
+      threshold: 0.01,
+    },
+  );
+
+  sectionMap.forEach(({ element }) => observer.observe(element));
+
+  window.addEventListener("hashchange", () => {
+    const hashId = window.location.hash.replace("#", "");
+    if (!hashId) {
+      return;
+    }
+
+    const exists = sectionMap.some((section) => section.id === hashId);
+    if (exists) {
+      setCurrentNavLink(hashId);
+    }
+  });
+};
+
+initSectionTracking();
