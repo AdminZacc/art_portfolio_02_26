@@ -56,15 +56,15 @@ const artworkMeta = {
 
 const initBackgroundAnimation = async () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reducedMotion || !window.tsParticles || !window.loadStarsPreset) {
+  if (!window.tsParticles) {
     return;
   }
 
-  await window.loadStarsPreset(window.tsParticles);
+  const motionSpeed = reducedMotion ? 0 : 0.22;
+
   await window.tsParticles.load({
     id: "bg-animation",
     options: {
-      preset: "stars",
       background: {
         color: "transparent",
       },
@@ -77,8 +77,12 @@ const initBackgroundAnimation = async () => {
         number: {
           value: 42,
         },
+        color: {
+          value: ["#ffffff", "#cfd9ea", "#9fb1cf"],
+        },
         move: {
-          speed: 0.22,
+          enable: true,
+          speed: motionSpeed,
         },
         opacity: {
           value: {
@@ -90,6 +94,13 @@ const initBackgroundAnimation = async () => {
           value: {
             min: 0.4,
             max: 1.8,
+          },
+        },
+        twinkle: {
+          particles: {
+            enable: true,
+            frequency: 0.02,
+            opacity: 1,
           },
         },
       },
