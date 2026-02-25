@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zealworthy Art Portfolio Gallery</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="bg-animation" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="logo" aria-label="Zealworthy logo">
+        <span class="logo-mark" aria-hidden="true">ZW</span>
+        <span class="logo-text">Zealworthy</span>
+      </div>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="#gallery-title">Gallery</a>
+        <a href="#about-title">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <h1 id="gallery-title">Gallery</h1>
+
+      <div class="gallery-wrap">
+        <div class="item item-1" aria-label="Gallery image 1"></div>
+        <div class="item item-2" aria-label="Gallery image 2"></div>
+        <div class="item item-3" aria-label="Gallery image 3"></div>
+        <div class="item item-4" aria-label="Gallery image 4"></div>
+        <div class="item item-5" aria-label="Gallery image 5"></div>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="item item-6" aria-label="Gallery image 6"></div>
+        <div class="item item-7" aria-label="Gallery image 7"></div>
+        <div class="item item-8" aria-label="Gallery image 8"></div>
+        <div class="item item-9" aria-label="Gallery image 9"></div>
+        <div class="item item-10" aria-label="Gallery image 10"></div>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="item item-11" aria-label="Gallery image 11"></div>
+        <div class="item item-12" aria-label="Gallery image 12"></div>
+        <div class="item item-13" aria-label="Gallery image 13"></div>
+        <div class="item item-14" aria-label="Gallery image 14"></div>
+        <div class="item item-15" aria-label="Gallery image 15"></div>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="item item-16" aria-label="Gallery image 16"></div>
+        <div class="item item-17" aria-label="Gallery image 17"></div>
+        <div class="item item-18" aria-label="Gallery image 18"></div>
+        <div class="item item-19" aria-label="Gallery image 19"></div>
+        <div class="item item-20" aria-label="Gallery image 20"></div>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="item item-21" aria-label="Gallery image 21"></div>
+        <div class="item item-22" aria-label="Gallery image 22"></div>
+        <div class="item item-23" aria-label="Gallery image 23"></div>
+        <div class="item item-24" aria-label="Gallery image 24"></div>
+        <div class="item item-25" aria-label="Gallery image 25"></div>
+      </div>
+
+      <section class="about-section" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p>
+          I create digital and mixed-media artwork that explores contrast, rhythm, and atmosphere. This portfolio highlights
+          pieces that combine motion-inspired composition with texture-forward visuals.
+        </p>
+        <p>
+          I’m available for commissions, collaborations, and creative direction for visual campaigns.
+        </p>
+      </section>
+    </div>
+
+    <div class="carousel-modal" id="carousel-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image carousel">
+      <button class="carousel-close" id="carousel-close" type="button" aria-label="Close gallery">×</button>
+      <button class="carousel-nav carousel-prev" id="carousel-prev" type="button" aria-label="Previous image">‹</button>
+      <figure class="carousel-figure">
+        <img class="carousel-image" id="carousel-image" src="" alt="" />
+        <figcaption class="carousel-caption" id="carousel-caption"></figcaption>
+      </figure>
+      <button class="carousel-nav carousel-next" id="carousel-next" type="button" aria-label="Next image">›</button>
+    </div>
+
+    <footer class="site-footer" id="contact">
+      <div class="footer-content">
+        <div>
+          <h3>Contact</h3>
+          <p><a href="mailto:zaccsartslaps@gmail.com">zaccsartslaps@gmail.com</a></p>
+          <p><a href="tel:+17576879235">+1 (757) 687-9235</a></p>
+        </div>
+        <div>
+          <h3>Zealworthy</h3>
+          <p>Available for commissions and collaborations.</p>
+          <p>Remote and on-site projects.</p>
+        </div>
+      </div>
+      <p class="credit">Accordion gallery layout inspired by a public CodePen concept, customized for this portfolio.</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/preset-stars@3/tsparticles.preset.stars.bundle.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
