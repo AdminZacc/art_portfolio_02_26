@@ -150,6 +150,21 @@ const shuffle = (array) => {
   return result;
 };
 
+const formatCaption = (fileName) => fileName.replace(/\.[^.]+$/, "").replace(/_/g, " ");
+
+const getArtworkMeta = (fileName) => {
+  const metadata = artworkMeta[fileName];
+  if (metadata) {
+    return metadata;
+  }
+
+  return {
+    title: formatCaption(fileName),
+    year: "",
+    medium: "Artwork",
+  };
+};
+
 const assignUniqueImages = () => {
   const randomized = shuffle(imageFiles);
   if (imageFiles.length < galleryItems.length) {
@@ -182,21 +197,6 @@ const assignUniqueImages = () => {
 assignUniqueImages();
 
 const getCarouselFiles = () => galleryItems.map((item) => item.dataset.fileName).filter(Boolean);
-
-const formatCaption = (fileName) => fileName.replace(/\.[^.]+$/, "").replace(/_/g, " ");
-
-const getArtworkMeta = (fileName) => {
-  const metadata = artworkMeta[fileName];
-  if (metadata) {
-    return metadata;
-  }
-
-  return {
-    title: formatCaption(fileName),
-    year: "",
-    medium: "Artwork",
-  };
-};
 
 const updateCarouselView = () => {
   const currentFile = carouselFiles[carouselIndex];
