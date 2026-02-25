@@ -26,6 +26,34 @@ const imageFiles = [
   "images/IMG_2603.jpg",
 ];
 
+const artworkMeta = {
+  "images/IMG_0236.PNG": { title: "Pulse Study", year: "2024", medium: "Digital" },
+  "images/IMG_1038.PNG": { title: "Night Frame", year: "2024", medium: "Digital" },
+  "images/IMG_1719.PNG": { title: "Liminal Glow", year: "2024", medium: "Digital" },
+  "images/IMG_2068.PNG": { title: "Broken Rhythm", year: "2024", medium: "Mixed Media" },
+  "images/IMG_2079.PNG": { title: "Quiet Current", year: "2024", medium: "Digital" },
+  "images/IMG_3979.PNG": { title: "Fog Signal", year: "2024", medium: "Digital" },
+  "images/IMG_0014.jpg": { title: "Signal One", year: "2025", medium: "Digital" },
+  "images/IMG_0200.jpg": { title: "Signal Two", year: "2025", medium: "Digital" },
+  "images/IMG_0247.jpg": { title: "Signal Three", year: "2025", medium: "Digital" },
+  "images/IMG_0545.jpg": { title: "Soft Break", year: "2025", medium: "Digital" },
+  "images/IMG_0627.jpg": { title: "Inner Echo", year: "2025", medium: "Digital" },
+  "images/IMG_0769.jpg": { title: "Outer Echo", year: "2025", medium: "Digital" },
+  "images/IMG_0821.jpg": { title: "Stutter Light", year: "2025", medium: "Digital" },
+  "images/IMG_1042.jpg": { title: "Threshold", year: "2025", medium: "Digital" },
+  "images/IMG_1061.jpg": { title: "Shifted Air", year: "2025", medium: "Mixed Media" },
+  "images/IMG_1063.jpg": { title: "Static Bloom", year: "2025", medium: "Digital" },
+  "images/IMG_1362.jpg": { title: "Held Tension", year: "2025", medium: "Digital" },
+  "images/IMG_1567.jpg": { title: "Blue Drift", year: "2025", medium: "Digital" },
+  "images/IMG_1685.jpg": { title: "Heat Line", year: "2025", medium: "Digital" },
+  "images/IMG_1724.jpg": { title: "Field Notes", year: "2025", medium: "Digital" },
+  "images/IMG_1769.jpg": { title: "Pressure Map", year: "2025", medium: "Mixed Media" },
+  "images/IMG_2133.jpg": { title: "Veil Study", year: "2025", medium: "Digital" },
+  "images/IMG_2148.jpg": { title: "Noise Garden", year: "2025", medium: "Digital" },
+  "images/IMG_2470.jpg": { title: "Late Horizon", year: "2025", medium: "Digital" },
+  "images/IMG_2603.jpg": { title: "Quiet Exit", year: "2025", medium: "Digital" },
+};
+
 const initBackgroundAnimation = async () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reducedMotion || !window.tsParticles || !window.loadStarsPreset) {
@@ -121,12 +149,13 @@ const assignUniqueImages = () => {
     const fileName = randomized[index];
 
     if (fileName) {
+      const metadata = getArtworkMeta(fileName);
       item.style.backgroundImage = `url("${fileName}")`;
       item.classList.remove("is-empty");
       item.dataset.fileName = fileName;
       item.setAttribute("role", "button");
       item.setAttribute("tabindex", "0");
-      item.setAttribute("aria-label", `Gallery image ${index + 1}: ${fileName}`);
+      item.setAttribute("aria-label", `Gallery image ${index + 1}: ${metadata.title}`);
       return;
     }
 
@@ -145,15 +174,32 @@ const getCarouselFiles = () => galleryItems.map((item) => item.dataset.fileName)
 
 const formatCaption = (fileName) => fileName.replace(/\.[^.]+$/, "").replace(/_/g, " ");
 
+const getArtworkMeta = (fileName) => {
+  const metadata = artworkMeta[fileName];
+  if (metadata) {
+    return metadata;
+  }
+
+  return {
+    title: formatCaption(fileName),
+    year: "",
+    medium: "Artwork",
+  };
+};
+
 const updateCarouselView = () => {
   const currentFile = carouselFiles[carouselIndex];
   if (!currentFile) {
     return;
   }
 
+  const metadata = getArtworkMeta(currentFile);
+  const detailParts = [metadata.year, metadata.medium].filter(Boolean);
+  const details = detailParts.length ? ` · ${detailParts.join(" · ")}` : "";
+
   carouselImage.src = currentFile;
-  carouselImage.alt = formatCaption(currentFile);
-  carouselCaption.textContent = `${carouselIndex + 1} / ${carouselFiles.length} · ${formatCaption(currentFile)}`;
+  carouselImage.alt = metadata.title;
+  carouselCaption.textContent = `${carouselIndex + 1} / ${carouselFiles.length} · ${metadata.title}${details}`;
 };
 
 const openCarousel = (startIndex, sourceItem) => {
