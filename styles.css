@@ -4,6 +4,10 @@ body {
   min-height: 100%;
 }
 
+:root {
+  --header-offset: 96px;
+}
+
 body {
   margin: 0;
   background: #101217;
@@ -310,7 +314,7 @@ h1[id],
 h2[id],
 section[id],
 footer[id] {
-  scroll-margin-top: 96px;
+  scroll-margin-top: calc(var(--header-offset) + 12px);
 }
 
 .gallery-wrap {
@@ -818,13 +822,6 @@ footer[id] {
   h1 {
     font-size: 32px;
     margin-bottom: 24px;
-  }
-
-  h1[id],
-  h2[id],
-  section[id],
-  footer[id] {
-    scroll-margin-top: 118px;
   }
 
   .gallery-wrap {

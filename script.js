@@ -688,6 +688,15 @@ const initializeTheme = () => {
   setTheme(initialTheme);
 };
 
+const syncHeaderOffset = () => {
+  if (!siteHeader) {
+    return;
+  }
+
+  const headerHeight = Math.ceil(siteHeader.getBoundingClientRect().height);
+  document.documentElement.style.setProperty("--header-offset", `${headerHeight}px`);
+};
+
 const updateHeaderStuckState = () => {
   if (!siteHeader) {
     return;
@@ -706,8 +715,10 @@ if (themeToggle) {
 
 initializeTheme();
 initShaderLab();
+syncHeaderOffset();
 updateHeaderStuckState();
 window.addEventListener("scroll", updateHeaderStuckState, { passive: true });
+window.addEventListener("resize", syncHeaderOffset);
 
 const setCurrentNavLink = (targetId) => {
   navLinks.forEach((link) => {
