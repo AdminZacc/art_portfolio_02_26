@@ -128,19 +128,57 @@ body {
 
 .theme-toggle {
   margin-left: 6px;
-  padding: 8px 12px;
-  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  padding: 8px 34px 8px 12px;
+  border-radius: 4px;
   border: 1px solid #36435a;
-  background: #161a22;
+  background:
+    linear-gradient(180deg, rgba(230, 235, 242, 0.1), rgba(230, 235, 242, 0) 58%),
+    repeating-linear-gradient(0deg, rgba(230, 235, 242, 0.05) 0 1px, transparent 1px 3px),
+    #161a22;
   color: #e6ebf2;
   font: 600 11px/1 "Inter", Arial, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  box-shadow:
+    inset 0 0 0 1px rgba(32, 40, 56, 0.9),
+    0 0 0 1px rgba(16, 18, 23, 0.8);
   cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.theme-toggle::after {
+  content: "☾";
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 1px solid #36435a;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+  background: #202838;
+  color: #e6ebf2;
 }
 
 .theme-toggle:hover {
-  background: #202838;
+  background:
+    linear-gradient(180deg, rgba(230, 235, 242, 0.14), rgba(230, 235, 242, 0) 58%),
+    repeating-linear-gradient(0deg, rgba(230, 235, 242, 0.06) 0 1px, transparent 1px 3px),
+    #202838;
+  box-shadow:
+    inset 0 0 0 1px rgba(54, 67, 90, 0.9),
+    0 0 0 1px rgba(32, 40, 56, 0.85);
+}
+
+.theme-toggle[aria-pressed="true"]::after {
+  content: "☀";
 }
 
 body.light {
@@ -261,6 +299,34 @@ html[data-theme="light"] .blog-modal-date,
 html[data-theme="light"] .carousel-caption,
 html[data-theme="light"] .footer-content a {
   color: #3a475f;
+}
+
+body.light .theme-toggle,
+html[data-theme="light"] .theme-toggle {
+  background:
+    linear-gradient(180deg, rgba(31, 42, 61, 0.1), rgba(31, 42, 61, 0) 58%),
+    repeating-linear-gradient(0deg, rgba(31, 42, 61, 0.05) 0 1px, transparent 1px 3px),
+    #ffffff;
+  border-color: #cfd7e6;
+  color: #1f2a3d;
+  box-shadow:
+    inset 0 0 0 1px rgba(207, 215, 230, 0.95),
+    0 0 0 1px rgba(231, 237, 247, 0.95);
+}
+
+body.light .theme-toggle::after,
+html[data-theme="light"] .theme-toggle::after {
+  border-color: #cfd7e6;
+  background: #e7edf7;
+  color: #1f2a3d;
+}
+
+body.light .theme-toggle:hover,
+html[data-theme="light"] .theme-toggle:hover {
+  background:
+    linear-gradient(180deg, rgba(31, 42, 61, 0.14), rgba(31, 42, 61, 0) 58%),
+    repeating-linear-gradient(0deg, rgba(31, 42, 61, 0.06) 0 1px, transparent 1px 3px),
+    #ffffff;
 }
 
 html[data-theme="light"] .logo-text,
