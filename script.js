@@ -152,6 +152,7 @@ const themeToggle = document.getElementById("theme-toggle");
 const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'));
 const shaderCanvas = document.getElementById("shader-canvas");
 const shaderStage = document.getElementById("shader-stage");
+const siteHeader = document.querySelector(".site-header");
 
 let carouselFiles = [];
 let carouselIndex = 0;
@@ -687,6 +688,14 @@ const initializeTheme = () => {
   setTheme(initialTheme);
 };
 
+const updateHeaderStuckState = () => {
+  if (!siteHeader) {
+    return;
+  }
+
+  siteHeader.classList.toggle("is-stuck", window.scrollY > 6);
+};
+
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
@@ -697,6 +706,8 @@ if (themeToggle) {
 
 initializeTheme();
 initShaderLab();
+updateHeaderStuckState();
+window.addEventListener("scroll", updateHeaderStuckState, { passive: true });
 
 const setCurrentNavLink = (targetId) => {
   navLinks.forEach((link) => {
