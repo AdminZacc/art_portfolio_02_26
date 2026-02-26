@@ -44,7 +44,13 @@ body {
 
 .site-header {
   width: min(1140px, 92vw);
-  margin: 22px auto 0;
+  margin: 0 auto;
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(16, 18, 23, 0.88);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -197,6 +203,10 @@ body.light .top-nav a[aria-current="page"] {
   color: #1f2a3d;
 }
 
+body.light .site-header {
+  background: rgba(244, 246, 251, 0.9);
+}
+
 body.light .carousel-modal,
 body.light .blog-modal {
   background: rgba(236, 241, 250, 0.95);
@@ -259,6 +269,10 @@ html[data-theme="light"] .shader-stage {
 html[data-theme="light"] .shader-intro,
 html[data-theme="light"] .shader-fallback {
   color: #3a475f;
+}
+
+html[data-theme="light"] .site-header {
+  background: rgba(244, 246, 251, 0.9);
 }
 
 .container {
@@ -760,7 +774,7 @@ h1 {
 
 @media (max-width: 900px) {
   .site-header {
-    margin-top: 16px;
+    padding: 12px 0;
     align-items: flex-start;
     gap: 10px;
     flex-direction: column;
