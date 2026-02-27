@@ -166,6 +166,7 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 let lastFocusedBlogCard = null;
+let shaderRenderNow = null;
 
 const shaderKnobState = {
   speed: 1,
@@ -236,6 +237,10 @@ const syncShaderKnobState = () => {
     if (shaderColorValue) {
       shaderColorValue.textContent = normalizedColor.toUpperCase();
     }
+  }
+
+  if (typeof shaderRenderNow === "function") {
+    shaderRenderNow();
   }
 };
 
@@ -652,6 +657,9 @@ const initShaderLab = () => {
 
       vec3 color = mix(paletteA, paletteB, glow);
       color = mix(color, paletteC, 0.5 + 0.5 * sin(time + suv.y * 5.0));
+      float accentWave = 0.5 + 0.5 * sin(time * 1.4 + rings * 2.0 + waves * 1.2);
+      float accentMix = (0.18 + glow * 0.22) * accentWave;
+      color = mix(color, u_accent, accentMix);
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -746,6 +754,10 @@ const initShaderLab = () => {
     gl.uniform1f(contrastLocation, clamp(shaderKnobState.contrast, 0.5, 1.5));
     gl.uniform3f(accentLocation, shaderColorState.accentRgb[0], shaderColorState.accentRgb[1], shaderColorState.accentRgb[2]);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+  };
+
+  shaderRenderNow = () => {
+    render(window.performance.now());
   };
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
