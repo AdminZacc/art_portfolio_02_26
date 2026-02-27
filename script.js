@@ -193,7 +193,7 @@ const shaderColorState = {
   },
 };
 
-const MUSIC_SEARCH_TERM = "lofi ambient instrumental chillhop";
+const MUSIC_SEARCH_TERM = "ambient instrumental chillhop";
 const MUSIC_DEFAULT_VOLUME = 0.2;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
