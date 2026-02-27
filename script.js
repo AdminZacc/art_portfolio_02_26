@@ -356,6 +356,8 @@ const createTrackItem = (track) => {
   const album = track.collectionName || "";
   meta.textContent = [duration, album].filter(Boolean).join(" • ");
 
+  panelButton.append(title, artist, meta);
+
   if (track.previewUrl) {
     panelButton.addEventListener("click", () => {
       loadTrackIntoPlayer(track, panelButton);
@@ -369,7 +371,6 @@ const createTrackItem = (track) => {
     panelButton.append(noPreview);
   }
 
-  panelButton.append(title, artist, meta);
   item.append(panelButton);
   return item;
 };
