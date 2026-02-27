@@ -656,7 +656,8 @@ const initShaderLab = () => {
       paletteC = mix(paletteC, u_accent, 0.42);
 
       vec3 color = mix(paletteA, paletteB, glow);
-      color = mix(color, paletteC, 0.5 + 0.5 * sin(time + suv.y * 5.0));
+      float paletteDrift = 0.5 + 0.5 * sin(time * 0.9 + length(suv) * 6.0 + waves * 0.7);
+      color = mix(color, paletteC, paletteDrift);
       float accentWave = 0.5 + 0.5 * sin(time * 1.4 + rings * 2.0 + waves * 1.2);
       float accentMix = (0.18 + glow * 0.22) * accentWave;
       color = mix(color, u_accent, accentMix);
