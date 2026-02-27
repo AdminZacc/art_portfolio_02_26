@@ -156,6 +156,9 @@ const shaderKnobInputs = Array.from(document.querySelectorAll("input[data-knob]"
 const shaderKnobValues = Array.from(document.querySelectorAll("output[data-knob-value]"));
 const shaderColorInputs = Array.from(document.querySelectorAll("input[data-knob-color]"));
 const shaderColorValues = Array.from(document.querySelectorAll("output[data-color-value]"));
+const musicRefreshButton = document.getElementById("music-refresh");
+const musicStatus = document.getElementById("music-status");
+const musicList = document.getElementById("music-list");
 const siteHeader = document.querySelector(".site-header");
 
 let carouselFiles = [];
@@ -259,6 +262,135 @@ const syncShaderKnobState = () => {
   if (typeof shaderRenderNow === "function") {
     shaderRenderNow();
   }
+};
+
+const formatTrackDuration = (durationMs) => {
+  if (!Number.isFinite(durationMs) || durationMs <= 0) {
+    return "";
+  }
+
+  const totalSeconds = Math.floor(durationMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+
+const clearMusicList = () => {
+  if (musicList) {
+    musicList.innerHTML = "";
+  }
+};
+
+const setMusicStatus = (message) => {
+  if (musicStatus) {
+    musicStatus.textContent = message;
+  }
+};
+
+const createTrackItem = (track) => {
+  const item = document.createElement("li");
+  item.className = "music-item";
+
+  const title = document.createElement("h3");
+  title.textContent = track.trackName || "Untitled track";
+
+  const artist = document.createElement("p");
+  artist.className = "music-artist";
+  artist.textContent = track.artistName || "Unknown artist";
+
+  const meta = document.createElement("p");
+  meta.className = "music-meta";
+  const duration = formatTrackDuration(track.trackTimeMillis);
+  const album = track.collectionName || "";
+  meta.textContent = [duration, album].filter(Boolean).join(" • ");
+
+  const links = document.createElement("p");
+  links.className = "music-links";
+
+  if (track.previewUrl) {
+    const previewLink = document.createElement("a");
+    previewLink.href = track.previewUrl;
+    previewLink.target = "_blank";
+    previewLink.rel = "noopener noreferrer";
+    previewLink.textContent = "Preview";
+    links.append(previewLink);
+  }
+
+  if (track.trackViewUrl) {
+    if (links.childElementCount) {
+      links.append(document.createTextNode(" · "));
+    }
+
+    const itunesLink = document.createElement("a");
+    itunesLink.href = track.trackViewUrl;
+    itunesLink.target = "_blank";
+    itunesLink.rel = "noopener noreferrer";
+    itunesLink.textContent = "Open in Apple Music";
+    links.append(itunesLink);
+  }
+
+  item.append(title, artist, meta, links);
+  return item;
+};
+
+const loadMusicFeed = async () => {
+  if (!musicList || !musicRefreshButton) {
+    return;
+  }
+
+  musicRefreshButton.disabled = true;
+  clearMusicList();
+  setMusicStatus("Loading tracks…");
+
+  const endpoint = new URL("https://itunes.apple.com/search");
+  endpoint.searchParams.set("term", "instrumental ambient");
+  endpoint.searchParams.set("media", "music");
+  endpoint.searchParams.set("entity", "song");
+  endpoint.searchParams.set("limit", "6");
+
+  try {
+    const response = await fetch(endpoint.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Music API request failed with status ${response.status}`);
+    }
+
+    const payload = await response.json();
+    const tracks = Array.isArray(payload.results) ? payload.results : [];
+
+    if (!tracks.length) {
+      setMusicStatus("No tracks found right now.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    tracks.forEach((track) => {
+      fragment.append(createTrackItem(track));
+    });
+    musicList.append(fragment);
+    setMusicStatus(`Loaded ${tracks.length} tracks.`);
+  } catch {
+    setMusicStatus("Music feed unavailable right now.");
+  } finally {
+    musicRefreshButton.disabled = false;
+  }
+};
+
+const initMusicFeed = () => {
+  if (!musicList || !musicRefreshButton) {
+    return;
+  }
+
+  musicRefreshButton.addEventListener("click", () => {
+    loadMusicFeed();
+  });
+
+  loadMusicFeed();
 };
 
 if (shaderKnobInputs.length || shaderColorInputs.length) {
@@ -861,6 +993,7 @@ if (themeToggle) {
 
 initializeTheme();
 initShaderLab();
+initMusicFeed();
 syncHeaderOffset();
 updateHeaderStuckState();
 window.addEventListener("scroll", updateHeaderStuckState, { passive: true });
