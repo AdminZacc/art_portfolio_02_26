@@ -189,6 +189,8 @@ const shaderColorState = {
   },
 };
 
+const MUSIC_SEARCH_TERM = "lofi ambient instrumental chillhop";
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const formatKnobValue = (value) => value.toFixed(2);
@@ -343,7 +345,7 @@ const loadMusicFeed = async () => {
   setMusicStatus("Loading tracks…");
 
   const endpoint = new URL("https://itunes.apple.com/search");
-  endpoint.searchParams.set("term", "instrumental ambient");
+  endpoint.searchParams.set("term", MUSIC_SEARCH_TERM);
   endpoint.searchParams.set("media", "music");
   endpoint.searchParams.set("entity", "song");
   endpoint.searchParams.set("limit", "6");
