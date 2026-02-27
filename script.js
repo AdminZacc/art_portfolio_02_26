@@ -154,8 +154,8 @@ const shaderCanvas = document.getElementById("shader-canvas");
 const shaderStage = document.getElementById("shader-stage");
 const shaderKnobInputs = Array.from(document.querySelectorAll("input[data-knob]"));
 const shaderKnobValues = Array.from(document.querySelectorAll("output[data-knob-value]"));
-const shaderColorInput = document.querySelector('input[data-knob-color="accent"]');
-const shaderColorValue = document.querySelector('output[data-color-value="accent"]');
+const shaderColorInputs = Array.from(document.querySelectorAll("input[data-knob-color]"));
+const shaderColorValues = Array.from(document.querySelectorAll("output[data-color-value]"));
 const siteHeader = document.querySelector(".site-header");
 
 let carouselFiles = [];
@@ -176,8 +176,14 @@ const shaderKnobState = {
 };
 
 const shaderColorState = {
-  accentHex: "#6ad8ff",
-  accentRgb: [0.4156862745, 0.8470588235, 1],
+  accent: {
+    hex: "#6ad8ff",
+    rgb: [0.4156862745, 0.8470588235, 1],
+  },
+  pink: {
+    hex: "#c77bdb",
+    rgb: [0.7803921569, 0.4823529412, 0.8588235294],
+  },
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -197,8 +203,8 @@ const normalizeHexColor = (value, fallback) => {
   return fallback;
 };
 
-const hexToRgbNormalized = (hexColor) => {
-  const normalized = normalizeHexColor(hexColor, "#6ad8ff");
+const hexToRgbNormalized = (hexColor, fallbackHex) => {
+  const normalized = normalizeHexColor(hexColor, fallbackHex);
   const red = Number.parseInt(normalized.slice(1, 3), 16) / 255;
   const green = Number.parseInt(normalized.slice(3, 5), 16) / 255;
   const blue = Number.parseInt(normalized.slice(5, 7), 16) / 255;
@@ -229,22 +235,33 @@ const syncShaderKnobState = () => {
     }
   });
 
-  if (shaderColorInput) {
-    const normalizedColor = normalizeHexColor(shaderColorInput.value, shaderColorState.accentHex);
-    shaderColorState.accentHex = normalizedColor;
-    shaderColorState.accentRgb = hexToRgbNormalized(normalizedColor);
+  const colorReadoutMap = new Map(
+    shaderColorValues.map((node) => [node.dataset.colorValue, node]),
+  );
 
-    if (shaderColorValue) {
-      shaderColorValue.textContent = normalizedColor.toUpperCase();
+  shaderColorInputs.forEach((input) => {
+    const colorKey = input.dataset.knobColor;
+    if (!colorKey || !(colorKey in shaderColorState)) {
+      return;
     }
-  }
+
+    const existingColor = shaderColorState[colorKey];
+    const normalizedColor = normalizeHexColor(input.value, existingColor.hex);
+    existingColor.hex = normalizedColor;
+    existingColor.rgb = hexToRgbNormalized(normalizedColor, existingColor.hex);
+
+    const readout = colorReadoutMap.get(colorKey);
+    if (readout) {
+      readout.textContent = normalizedColor.toUpperCase();
+    }
+  });
 
   if (typeof shaderRenderNow === "function") {
     shaderRenderNow();
   }
 };
 
-if (shaderKnobInputs.length || shaderColorInput) {
+if (shaderKnobInputs.length || shaderColorInputs.length) {
   syncShaderKnobState();
 
   shaderKnobInputs.forEach((input) => {
@@ -252,10 +269,10 @@ if (shaderKnobInputs.length || shaderColorInput) {
     input.addEventListener("change", syncShaderKnobState);
   });
 
-  if (shaderColorInput) {
-    shaderColorInput.addEventListener("input", syncShaderKnobState);
-    shaderColorInput.addEventListener("change", syncShaderKnobState);
-  }
+  shaderColorInputs.forEach((input) => {
+    input.addEventListener("input", syncShaderKnobState);
+    input.addEventListener("change", syncShaderKnobState);
+  });
 }
 
 const blogPosts = {
@@ -625,6 +642,7 @@ const initShaderLab = () => {
     uniform float u_warp;
     uniform float u_contrast;
     uniform vec3 u_accent;
+    uniform vec3 u_pink;
 
     void main() {
       vec2 uv = (gl_FragCoord.xy / u_resolution.xy) * 2.0 - 1.0;
@@ -652,6 +670,7 @@ const initShaderLab = () => {
 
       vec3 paletteA = mix(darkA, lightA, u_theme);
       vec3 paletteB = mix(darkB, lightB, u_theme);
+      paletteB = mix(paletteB, u_pink, 0.72);
       vec3 paletteC = mix(darkC, lightC, u_theme);
       paletteC = mix(paletteC, u_accent, 0.42);
 
@@ -717,6 +736,7 @@ const initShaderLab = () => {
   const warpLocation = gl.getUniformLocation(program, "u_warp");
   const contrastLocation = gl.getUniformLocation(program, "u_contrast");
   const accentLocation = gl.getUniformLocation(program, "u_accent");
+  const pinkLocation = gl.getUniformLocation(program, "u_pink");
 
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -753,7 +773,8 @@ const initShaderLab = () => {
     gl.uniform1f(scaleLocation, clamp(shaderKnobState.scale, 0.6, 1.8));
     gl.uniform1f(warpLocation, clamp(shaderKnobState.warp, 0.0, 2.0));
     gl.uniform1f(contrastLocation, clamp(shaderKnobState.contrast, 0.5, 1.5));
-    gl.uniform3f(accentLocation, shaderColorState.accentRgb[0], shaderColorState.accentRgb[1], shaderColorState.accentRgb[2]);
+    gl.uniform3f(accentLocation, shaderColorState.accent.rgb[0], shaderColorState.accent.rgb[1], shaderColorState.accent.rgb[2]);
+    gl.uniform3f(pinkLocation, shaderColorState.pink.rgb[0], shaderColorState.pink.rgb[1], shaderColorState.pink.rgb[2]);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
