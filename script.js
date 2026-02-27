@@ -194,6 +194,7 @@ const shaderColorState = {
 };
 
 const MUSIC_SEARCH_TERM = "lofi ambient instrumental chillhop";
+const MUSIC_DEFAULT_VOLUME = 0.2;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -372,7 +373,11 @@ const createTrackItem = (track) => {
   }
 
   item.append(panelButton);
-  return item;
+  return {
+    item,
+    panelButton,
+    hasPreview: Boolean(track.previewUrl),
+  };
 };
 
 const loadMusicFeed = async () => {
@@ -421,10 +426,34 @@ const loadMusicFeed = async () => {
     }
 
     const fragment = document.createDocumentFragment();
+    let firstPlayableTrack = null;
+
     tracks.forEach((track) => {
-      fragment.append(createTrackItem(track));
+      const trackNode = createTrackItem(track);
+      fragment.append(trackNode.item);
+
+      if (!firstPlayableTrack && trackNode.hasPreview) {
+        firstPlayableTrack = {
+          track,
+          button: trackNode.panelButton,
+        };
+      }
     });
+
     musicList.append(fragment);
+
+    if (firstPlayableTrack && musicAudio) {
+      loadTrackIntoPlayer(firstPlayableTrack.track, firstPlayableTrack.button);
+
+      try {
+        await musicAudio.play();
+        setMusicStatus(`Loaded ${tracks.length} tracks. Autoplay on at 20% volume.`);
+      } catch {
+        setMusicStatus(`Loaded ${tracks.length} tracks. Tap a track to start playback.`);
+      }
+      return;
+    }
+
     setMusicStatus(`Loaded ${tracks.length} tracks.`);
   } catch {
     setMusicStatus("Music feed unavailable right now.");
@@ -439,6 +468,8 @@ const initMusicFeed = () => {
   }
 
   if (musicAudio) {
+    musicAudio.volume = MUSIC_DEFAULT_VOLUME;
+
     musicAudio.addEventListener("ended", () => {
       resetActiveTrackButton();
       activePreviewUrl = "";
