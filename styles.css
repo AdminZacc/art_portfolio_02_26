@@ -121,6 +121,7 @@ body {
 .carousel-nav:focus-visible,
 .carousel-close:focus-visible,
 .blog-modal-close:focus-visible,
+.shader-knob input:focus-visible,
 .footer-content a:focus-visible {
   outline: 2px solid #e6ebf2;
   outline-offset: 3px;
@@ -274,6 +275,16 @@ body.light .shader-fallback {
   color: #3a475f;
 }
 
+body.light .shader-knobs {
+  background: #ffffff;
+  border-color: #cfd7e6;
+}
+
+body.light .shader-knobs-title,
+body.light .shader-knob span {
+  color: #1f2a3d;
+}
+
 html[data-theme="light"] .logo-mark,
 html[data-theme="light"] .about-section,
 html[data-theme="light"] .blog-card,
@@ -349,6 +360,16 @@ html[data-theme="light"] .shader-stage {
 html[data-theme="light"] .shader-intro,
 html[data-theme="light"] .shader-fallback {
   color: #3a475f;
+}
+
+html[data-theme="light"] .shader-knobs {
+  background: #ffffff;
+  border-color: #cfd7e6;
+}
+
+html[data-theme="light"] .shader-knobs-title,
+html[data-theme="light"] .shader-knob span {
+  color: #1f2a3d;
 }
 
 html[data-theme="light"] .site-header {
@@ -490,6 +511,60 @@ footer[id] {
 
 .shader-stage.is-fallback #shader-canvas {
   display: none;
+}
+
+.shader-knobs {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #2b3445;
+  border-radius: 12px;
+  background: #161a22;
+}
+
+.shader-knobs-title {
+  margin: 0 0 10px;
+  color: #e6ebf2;
+  font: 600 12px/1 "Inter", Arial, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shader-knobs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.shader-knob {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shader-knob span {
+  color: #c8d1df;
+  font: 500 12px/1.2 "Inter", Arial, sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.shader-knob-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.shader-knob output {
+  min-width: 42px;
+  text-align: right;
+  color: #a9b4c8;
+  font: 600 11px/1 "Inter", Arial, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.shader-knob input {
+  width: 100%;
+  margin: 0;
 }
 
 .about-section {
@@ -922,6 +997,10 @@ footer[id] {
 
   #shader-canvas {
     height: 240px;
+  }
+
+  .shader-knobs-grid {
+    grid-template-columns: 1fr;
   }
 
   .blog-section h2 {

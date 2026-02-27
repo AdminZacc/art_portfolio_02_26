@@ -107,6 +107,27 @@
           <canvas id="shader-canvas" aria-label="Animated shader art preview"></canvas>
           <p class="shader-fallback" id="shader-fallback">Shader preview unavailable in this browser.</p>
         </div>
+        <div class="shader-knobs" aria-label="Shader controls">
+          <h3 class="shader-knobs-title">Nerd knobs</h3>
+          <div class="shader-knobs-grid">
+            <label class="shader-knob" for="knob-speed">
+              <span class="shader-knob-label">Speed <output for="knob-speed" data-knob-value="speed">1.00</output></span>
+              <input id="knob-speed" type="range" min="0" max="2" step="0.01" value="1" data-knob="speed" />
+            </label>
+            <label class="shader-knob" for="knob-scale">
+              <span class="shader-knob-label">Scale <output for="knob-scale" data-knob-value="scale">1.00</output></span>
+              <input id="knob-scale" type="range" min="0.6" max="1.8" step="0.01" value="1" data-knob="scale" />
+            </label>
+            <label class="shader-knob" for="knob-warp">
+              <span class="shader-knob-label">Warp <output for="knob-warp" data-knob-value="warp">1.00</output></span>
+              <input id="knob-warp" type="range" min="0" max="2" step="0.01" value="1" data-knob="warp" />
+            </label>
+            <label class="shader-knob" for="knob-contrast">
+              <span class="shader-knob-label">Contrast <output for="knob-contrast" data-knob-value="contrast">1.00</output></span>
+              <input id="knob-contrast" type="range" min="0.5" max="1.5" step="0.01" value="1" data-knob="contrast" />
+            </label>
+          </div>
+        </div>
       </section>
 
       <section class="about-section" aria-labelledby="about-title">

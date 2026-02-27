@@ -152,6 +152,8 @@ const themeToggle = document.getElementById("theme-toggle");
 const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'));
 const shaderCanvas = document.getElementById("shader-canvas");
 const shaderStage = document.getElementById("shader-stage");
+const shaderKnobInputs = Array.from(document.querySelectorAll("input[data-knob]"));
+const shaderKnobValues = Array.from(document.querySelectorAll("output[data-knob-value]"));
 const siteHeader = document.querySelector(".site-header");
 
 let carouselFiles = [];
@@ -162,6 +164,50 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 let lastFocusedBlogCard = null;
+
+const shaderKnobState = {
+  speed: 1,
+  scale: 1,
+  warp: 1,
+  contrast: 1,
+};
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const formatKnobValue = (value) => value.toFixed(2);
+
+const syncShaderKnobState = () => {
+  const readoutMap = new Map(
+    shaderKnobValues.map((node) => [node.dataset.knobValue, node]),
+  );
+
+  shaderKnobInputs.forEach((input) => {
+    const knobName = input.dataset.knob;
+    if (!knobName || !(knobName in shaderKnobState)) {
+      return;
+    }
+
+    const parsedValue = Number.parseFloat(input.value);
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    shaderKnobState[knobName] = parsedValue;
+
+    const readout = readoutMap.get(knobName);
+    if (readout) {
+      readout.textContent = formatKnobValue(parsedValue);
+    }
+  });
+};
+
+if (shaderKnobInputs.length) {
+  syncShaderKnobState();
+  shaderKnobInputs.forEach((input) => {
+    input.addEventListener("input", syncShaderKnobState);
+    input.addEventListener("change", syncShaderKnobState);
+  });
+}
 
 const blogPosts = {
   "atmosphere-contrast": {
@@ -525,16 +571,26 @@ const initShaderLab = () => {
     uniform vec2 u_resolution;
     uniform float u_time;
     uniform float u_theme;
+    uniform float u_speed;
+    uniform float u_scale;
+    uniform float u_warp;
+    uniform float u_contrast;
 
     void main() {
       vec2 uv = (gl_FragCoord.xy / u_resolution.xy) * 2.0 - 1.0;
       uv.x *= u_resolution.x / u_resolution.y;
 
-      float time = u_time * 0.42;
-      float rings = sin(length(uv) * 12.0 - time * 3.0);
-      float waves = sin((uv.x * 4.2 + time) + sin(uv.y * 6.0 - time * 1.8));
-      float pulse = sin(time * 2.5 + length(uv) * 9.0);
+      float scale = max(0.25, u_scale);
+      vec2 suv = uv * scale;
+      float time = u_time * 0.42 * u_speed;
+      float ringFreq = 12.0 * (0.75 + u_warp * 0.45);
+      float waveX = 4.2 * (0.7 + u_warp * 0.3);
+      float waveY = 6.0 * (0.6 + u_warp * 0.4);
+      float rings = sin(length(suv) * ringFreq - time * 3.0);
+      float waves = sin((suv.x * waveX + time) + sin(suv.y * waveY - time * 1.8));
+      float pulse = sin(time * 2.5 + length(suv) * 9.0);
       float glow = 0.5 + 0.5 * (rings * 0.55 + waves * 0.3 + pulse * 0.25);
+      glow = clamp((glow - 0.5) * u_contrast + 0.5, 0.0, 1.0);
 
       vec3 darkA = vec3(0.06, 0.10, 0.22);
       vec3 darkB = vec3(0.62, 0.35, 0.84);
@@ -549,7 +605,7 @@ const initShaderLab = () => {
       vec3 paletteC = mix(darkC, lightC, u_theme);
 
       vec3 color = mix(paletteA, paletteB, glow);
-      color = mix(color, paletteC, 0.5 + 0.5 * sin(time + uv.y * 5.0));
+      color = mix(color, paletteC, 0.5 + 0.5 * sin(time + suv.y * 5.0));
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -601,6 +657,10 @@ const initShaderLab = () => {
   const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
   const timeLocation = gl.getUniformLocation(program, "u_time");
   const themeLocation = gl.getUniformLocation(program, "u_theme");
+  const speedLocation = gl.getUniformLocation(program, "u_speed");
+  const scaleLocation = gl.getUniformLocation(program, "u_scale");
+  const warpLocation = gl.getUniformLocation(program, "u_warp");
+  const contrastLocation = gl.getUniformLocation(program, "u_contrast");
 
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -633,6 +693,10 @@ const initShaderLab = () => {
     gl.uniform2f(resolutionLocation, shaderCanvas.width, shaderCanvas.height);
     gl.uniform1f(timeLocation, timeSeconds);
     gl.uniform1f(themeLocation, isLightTheme);
+    gl.uniform1f(speedLocation, clamp(shaderKnobState.speed, 0.0, 2.0));
+    gl.uniform1f(scaleLocation, clamp(shaderKnobState.scale, 0.6, 1.8));
+    gl.uniform1f(warpLocation, clamp(shaderKnobState.warp, 0.0, 2.0));
+    gl.uniform1f(contrastLocation, clamp(shaderKnobState.contrast, 0.5, 1.5));
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
