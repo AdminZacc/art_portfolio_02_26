@@ -285,6 +285,15 @@ body.light .shader-knob span {
   color: #1f2a3d;
 }
 
+body.light .shader-knob output {
+  color: #3a475f;
+}
+
+body.light .shader-knob-color input {
+  border-color: #cfd7e6;
+  background: #ffffff;
+}
+
 html[data-theme="light"] .logo-mark,
 html[data-theme="light"] .about-section,
 html[data-theme="light"] .blog-card,
@@ -370,6 +379,15 @@ html[data-theme="light"] .shader-knobs {
 html[data-theme="light"] .shader-knobs-title,
 html[data-theme="light"] .shader-knob span {
   color: #1f2a3d;
+}
+
+html[data-theme="light"] .shader-knob output {
+  color: #3a475f;
+}
+
+html[data-theme="light"] .shader-knob-color input {
+  border-color: #cfd7e6;
+  background: #ffffff;
 }
 
 html[data-theme="light"] .site-header {
@@ -565,6 +583,14 @@ footer[id] {
 .shader-knob input {
   width: 100%;
   margin: 0;
+}
+
+.shader-knob-color input {
+  height: 32px;
+  border: 1px solid #36435a;
+  border-radius: 6px;
+  background: #161a22;
+  cursor: pointer;
 }
 
 .about-section {
