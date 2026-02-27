@@ -159,6 +159,8 @@ const shaderColorValues = Array.from(document.querySelectorAll("output[data-colo
 const musicRefreshButton = document.getElementById("music-refresh");
 const musicStatus = document.getElementById("music-status");
 const musicList = document.getElementById("music-list");
+const musicAudio = document.getElementById("music-audio");
+const musicNowPlaying = document.getElementById("music-now-playing");
 const siteHeader = document.querySelector(".site-header");
 
 let carouselFiles = [];
@@ -170,6 +172,8 @@ let touchEndX = 0;
 let touchEndY = 0;
 let lastFocusedBlogCard = null;
 let shaderRenderNow = null;
+let activeTrackButton = null;
+let activePreviewUrl = "";
 
 const shaderKnobState = {
   speed: 1,
@@ -289,6 +293,64 @@ const setMusicStatus = (message) => {
   }
 };
 
+const setNowPlayingLabel = (message) => {
+  if (musicNowPlaying) {
+    musicNowPlaying.textContent = `Now playing: ${message}`;
+  }
+};
+
+const setTrackButtonState = (button, isPlaying) => {
+  if (!button) {
+    return;
+  }
+
+  button.textContent = isPlaying ? "Pause" : "Play";
+  button.setAttribute("aria-pressed", String(isPlaying));
+  button.classList.toggle("is-active", isPlaying);
+};
+
+const resetActiveTrackButton = () => {
+  if (activeTrackButton) {
+    setTrackButtonState(activeTrackButton, false);
+  }
+  activeTrackButton = null;
+};
+
+const playTrackPreview = async (track, button) => {
+  if (!musicAudio || !button || !track.previewUrl) {
+    return;
+  }
+
+  const isSameTrack = activePreviewUrl === track.previewUrl;
+
+  if (isSameTrack && !musicAudio.paused) {
+    musicAudio.pause();
+    setTrackButtonState(button, false);
+    setNowPlayingLabel("paused");
+    return;
+  }
+
+  if (!isSameTrack) {
+    musicAudio.src = track.previewUrl;
+    activePreviewUrl = track.previewUrl;
+  }
+
+  if (activeTrackButton && activeTrackButton !== button) {
+    setTrackButtonState(activeTrackButton, false);
+  }
+
+  activeTrackButton = button;
+
+  try {
+    await musicAudio.play();
+    setTrackButtonState(button, true);
+    setNowPlayingLabel(`${track.trackName || "Untitled track"} — ${track.artistName || "Unknown artist"}`);
+  } catch {
+    setTrackButtonState(button, false);
+    setNowPlayingLabel("unable to play preview");
+  }
+};
+
 const createTrackItem = (track) => {
   const item = document.createElement("li");
   item.className = "music-item";
@@ -310,12 +372,20 @@ const createTrackItem = (track) => {
   links.className = "music-links";
 
   if (track.previewUrl) {
-    const previewLink = document.createElement("a");
-    previewLink.href = track.previewUrl;
-    previewLink.target = "_blank";
-    previewLink.rel = "noopener noreferrer";
-    previewLink.textContent = "Preview";
-    links.append(previewLink);
+    const previewButton = document.createElement("button");
+    previewButton.type = "button";
+    previewButton.className = "music-play";
+    previewButton.textContent = "Play";
+    previewButton.setAttribute("aria-pressed", "false");
+    previewButton.addEventListener("click", () => {
+      playTrackPreview(track, previewButton);
+    });
+    links.append(previewButton);
+  } else {
+    const noPreview = document.createElement("span");
+    noPreview.className = "music-no-preview";
+    noPreview.textContent = "No preview";
+    links.append(noPreview);
   }
 
   if (track.trackViewUrl) {
@@ -341,6 +411,16 @@ const loadMusicFeed = async () => {
   }
 
   musicRefreshButton.disabled = true;
+  resetActiveTrackButton();
+  activePreviewUrl = "";
+
+  if (musicAudio) {
+    musicAudio.pause();
+    musicAudio.removeAttribute("src");
+    musicAudio.load();
+  }
+
+  setNowPlayingLabel("none");
   clearMusicList();
   setMusicStatus("Loading tracks…");
 
@@ -386,6 +466,21 @@ const loadMusicFeed = async () => {
 const initMusicFeed = () => {
   if (!musicList || !musicRefreshButton) {
     return;
+  }
+
+  if (musicAudio) {
+    musicAudio.addEventListener("ended", () => {
+      resetActiveTrackButton();
+      activePreviewUrl = "";
+      setNowPlayingLabel("none");
+    });
+
+    musicAudio.addEventListener("pause", () => {
+      if (activeTrackButton && musicAudio.currentTime > 0 && !musicAudio.ended) {
+        setTrackButtonState(activeTrackButton, false);
+        setNowPlayingLabel("paused");
+      }
+    });
   }
 
   musicRefreshButton.addEventListener("click", () => {

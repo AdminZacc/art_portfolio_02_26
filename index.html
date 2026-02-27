@@ -187,6 +187,10 @@
       <section class="music-section" aria-labelledby="music-title">
         <h2 id="music-title">Studio Playlist</h2>
         <p class="music-intro">Live pull from iTunes Search API.</p>
+        <div class="music-player" id="music-player">
+          <p class="music-now-playing" id="music-now-playing">Now playing: none</p>
+          <audio class="music-audio" id="music-audio" controls preload="none"></audio>
+        </div>
         <div class="music-toolbar">
           <button class="music-refresh" id="music-refresh" type="button">Refresh tracks</button>
           <p class="music-status" id="music-status" role="status" aria-live="polite">Loading tracks…</p>
