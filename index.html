@@ -177,6 +177,16 @@
           </article>
         </div>
       </section>
+
+      <section class="music-section" aria-labelledby="music-title">
+        <h2 id="music-title">Studio Playlist</h2>
+        <p class="music-intro">Live pull from iTunes Search API.</p>
+        <div class="music-toolbar">
+          <button class="music-refresh" id="music-refresh" type="button">Refresh tracks</button>
+          <p class="music-status" id="music-status" role="status" aria-live="polite">Loading tracks…</p>
+        </div>
+        <ul class="music-list" id="music-list" aria-label="Music track results"></ul>
+      </section>
     </main>
 
     <div class="carousel-modal" id="carousel-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image carousel">
