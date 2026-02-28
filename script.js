@@ -70,64 +70,69 @@ const initBackgroundAnimation = async () => {
   }
 
   const motionSpeed = reducedMotion ? 0 : 0.22;
-
-  await window.tsParticles.load({
-    id: "bg-animation",
-    options: {
-      background: {
-        color: "transparent",
+  const particleOptions = {
+    background: {
+      color: "transparent",
+    },
+    fullScreen: {
+      enable: false,
+    },
+    detectRetina: true,
+    fpsLimit: 60,
+    particles: {
+      number: {
+        value: 54,
       },
-      fullScreen: {
-        enable: false,
+      color: {
+        value: ["#ffffff", "#cfd9ea", "#9fb1cf"],
       },
-      detectRetina: true,
-      fpsLimit: 60,
-      particles: {
-        number: {
-          value: 42,
+      move: {
+        enable: true,
+        speed: motionSpeed,
+      },
+      opacity: {
+        value: {
+          min: 0.12,
+          max: 0.42,
         },
-        color: {
-          value: ["#ffffff", "#cfd9ea", "#9fb1cf"],
+      },
+      size: {
+        value: {
+          min: 0.5,
+          max: 2,
         },
-        move: {
+      },
+      twinkle: {
+        particles: {
           enable: true,
-          speed: motionSpeed,
-        },
-        opacity: {
-          value: {
-            min: 0.08,
-            max: 0.3,
-          },
-        },
-        size: {
-          value: {
-            min: 0.4,
-            max: 1.8,
-          },
-        },
-        twinkle: {
-          particles: {
-            enable: true,
-            frequency: 0.02,
-            opacity: 1,
-          },
-        },
-      },
-      interactivity: {
-        events: {
-          onHover: {
-            enable: false,
-          },
-          onClick: {
-            enable: false,
-          },
-          resize: {
-            enable: true,
-          },
+          frequency: 0.02,
+          opacity: 1,
         },
       },
     },
-  });
+    interactivity: {
+      events: {
+        onHover: {
+          enable: false,
+        },
+        onClick: {
+          enable: false,
+        },
+        resize: {
+          enable: true,
+        },
+      },
+    },
+  };
+
+  try {
+    await window.tsParticles.load({
+      id: "bg-animation",
+      options: particleOptions,
+    });
+  } catch {
+    await window.tsParticles.load("bg-animation", particleOptions);
+  }
 };
 
 initBackgroundAnimation().catch(() => {
