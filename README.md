@@ -5,7 +5,9 @@ Single-page portfolio site for showcasing digital work, murals, and studio updat
 ## Current Features
 - Interactive gallery with keyboard/touch-enabled image carousel
 - Dedicated Featured Murals section
-- Blog preview section with clickable full-post modal
+- Blog preview section with clickable full-post modal and in-card image headers
+- Studio Playlist panel powered by iTunes Search API
+- Shared in-page audio player with compact right-side playlist dock
 - Animated starfield background (respects reduced-motion preference)
 - Accessibility improvements:
 	- Skip link
@@ -13,6 +15,9 @@ Single-page portfolio site for showcasing digital work, murals, and studio updat
 	- Keyboard interactions for cards/gallery
 	- Scroll-aware nav with `aria-current`
 - Theme toggle (light/dark) with saved preference
+
+## Status
+- Assignment paused on 2026-02-28.
 
 ## Project Structure
 - `index.html` — page layout, sections, modal containers

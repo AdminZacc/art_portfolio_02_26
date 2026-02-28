@@ -1,6 +1,20 @@
 # Progress Log
 
 ## Date
+- 2026-02-28
+
+## Completed
+- Removed Shader Lab and all shader-related HTML/CSS/JS.
+- Added and iterated music experience: API-backed playlist, shared player apparatus, panel-button interaction, compact right-side dock, and ultra-compact pass.
+- Added autoplay attempt for first loaded preview at 20% default volume with browser-safe fallback.
+- Added then removed Cloudflare-specific UI/docs based on direction change.
+- Added blog card image-header blocks for each post and refreshed selected media backgrounds.
+- Verified particle background initialization compatibility and increased visibility.
+
+## Notes
+- Work paused by request for now.
+
+## Date
 - 2026-02-27
 
 ## Completed
