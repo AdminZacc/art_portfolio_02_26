@@ -1,6 +1,20 @@
 # Progress Log
 
 ## Date
+- 2026-02-27
+
+## Completed
+- Removed Shader Lab section and related JS/CSS to better match the site theme.
+- Expanded music section into a compact right-side dock with responsive mobile behavior.
+- Added shared in-page music player behavior and compact playlist interactions.
+- Updated background particle visibility and loader compatibility.
+- Chosen auth direction: Cloudflare Access (Zero Trust) with setup steps documented in `README.md`.
+
+## Notes
+- Access auth is configured at the Cloudflare edge/dashboard level, not in-site login UI.
+- If you later need user-specific app sessions (beyond edge gating), pair Access with Worker session logic.
+
+## Date
 - 2026-02-25
 
 ## Completed
