@@ -92,19 +92,6 @@ body {
   text-transform: uppercase;
 }
 
-.access-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid #36435a;
-  background: #161a22;
-  color: #c8d1df;
-  font: 600 10px/1 "Inter", Arial, sans-serif;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .top-nav {
   display: flex;
   align-items: center;
@@ -240,12 +227,6 @@ body.light .blog-card h3,
 body.light .blog-modal-content h3,
 body.light .footer-content h3 {
   color: #1f2a3d;
-}
-
-body.light .access-badge {
-  background: #ffffff;
-  border-color: #cfd7e6;
-  color: #3a475f;
 }
 
 body.light .top-nav a,
@@ -1082,11 +1063,6 @@ footer[id] {
 
   .top-nav {
     gap: 12px;
-  }
-
-  .access-badge {
-    padding: 3px 7px;
-    font-size: 9px;
   }
 
   .theme-toggle {

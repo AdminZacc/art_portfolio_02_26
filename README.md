@@ -44,26 +44,3 @@ Update blog cards in `index.html` and full post content in `blogPosts` inside `s
 
 ### Contact Info
 Update footer links in `index.html`.
-
-## Cloudflare Access (Auth)
-This site can be protected with Cloudflare Access without adding login code to `index.html` or `script.js`.
-
-### Recommended Setup (Entire Site)
-1. In Cloudflare Dashboard, go to **Zero Trust**.
-2. Open **Access** -> **Applications** -> **Add an application**.
-3. Choose:
-	- **Self-hosted** if this domain is proxied through Cloudflare DNS, or
-	- **Cloudflare Pages** if hosted on Pages.
-4. Set **Application domain** to your site (example: `portfolio.yourdomain.com`).
-5. Add a **Policy**:
-	- Action: **Allow**
-	- Include: your email(s), domain, or identity provider group.
-6. Add an identity provider under **Settings** -> **Authentication** (Google, GitHub, One-Time PIN, etc.).
-7. Save and test in an incognito window.
-
-### Optional: Public + Protected Split
-If you want most of the site public, create an Access app only for a protected path such as `/admin/*`.
-
-### Notes
-- No client-side auth code changes are required for Access login gating.
-- If API routes are added later, include those paths in your Access policy design.
