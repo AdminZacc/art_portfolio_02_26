@@ -150,12 +150,6 @@ const blogModalTitle = document.getElementById("blog-modal-title");
 const blogModalBody = document.getElementById("blog-modal-body");
 const themeToggle = document.getElementById("theme-toggle");
 const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'));
-const shaderCanvas = document.getElementById("shader-canvas");
-const shaderStage = document.getElementById("shader-stage");
-const shaderKnobInputs = Array.from(document.querySelectorAll("input[data-knob]"));
-const shaderKnobValues = Array.from(document.querySelectorAll("output[data-knob-value]"));
-const shaderColorInputs = Array.from(document.querySelectorAll("input[data-knob-color]"));
-const shaderColorValues = Array.from(document.querySelectorAll("output[data-color-value]"));
 const musicRefreshButton = document.getElementById("music-refresh");
 const musicStatus = document.getElementById("music-status");
 const musicList = document.getElementById("music-list");
@@ -171,105 +165,12 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 let lastFocusedBlogCard = null;
-let shaderRenderNow = null;
 let activeTrackButton = null;
 let activePreviewUrl = "";
-
-const shaderKnobState = {
-  speed: 1,
-  scale: 1,
-  warp: 1,
-  contrast: 1,
-};
-
-const shaderColorState = {
-  accent: {
-    hex: "#6ad8ff",
-    rgb: [0.4156862745, 0.8470588235, 1],
-  },
-  pink: {
-    hex: "#c77bdb",
-    rgb: [0.7803921569, 0.4823529412, 0.8588235294],
-  },
-};
 
 const MUSIC_SEARCH_TERM = "ambient instrumental chillhop";
 const MUSIC_DEFAULT_VOLUME = 0.2;
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-const formatKnobValue = (value) => value.toFixed(2);
-
-const normalizeHexColor = (value, fallback) => {
-  if (typeof value !== "string") {
-    return fallback;
-  }
-
-  const trimmed = value.trim();
-  if (/^#[0-9a-fA-F]{6}$/.test(trimmed)) {
-    return trimmed.toLowerCase();
-  }
-
-  return fallback;
-};
-
-const hexToRgbNormalized = (hexColor, fallbackHex) => {
-  const normalized = normalizeHexColor(hexColor, fallbackHex);
-  const red = Number.parseInt(normalized.slice(1, 3), 16) / 255;
-  const green = Number.parseInt(normalized.slice(3, 5), 16) / 255;
-  const blue = Number.parseInt(normalized.slice(5, 7), 16) / 255;
-  return [red, green, blue];
-};
-
-const syncShaderKnobState = () => {
-  const readoutMap = new Map(
-    shaderKnobValues.map((node) => [node.dataset.knobValue, node]),
-  );
-
-  shaderKnobInputs.forEach((input) => {
-    const knobName = input.dataset.knob;
-    if (!knobName || !(knobName in shaderKnobState)) {
-      return;
-    }
-
-    const parsedValue = Number.parseFloat(input.value);
-    if (!Number.isFinite(parsedValue)) {
-      return;
-    }
-
-    shaderKnobState[knobName] = parsedValue;
-
-    const readout = readoutMap.get(knobName);
-    if (readout) {
-      readout.textContent = formatKnobValue(parsedValue);
-    }
-  });
-
-  const colorReadoutMap = new Map(
-    shaderColorValues.map((node) => [node.dataset.colorValue, node]),
-  );
-
-  shaderColorInputs.forEach((input) => {
-    const colorKey = input.dataset.knobColor;
-    if (!colorKey || !(colorKey in shaderColorState)) {
-      return;
-    }
-
-    const existingColor = shaderColorState[colorKey];
-    const normalizedColor = normalizeHexColor(input.value, existingColor.hex);
-    existingColor.hex = normalizedColor;
-    existingColor.rgb = hexToRgbNormalized(normalizedColor, existingColor.hex);
-
-    const readout = colorReadoutMap.get(colorKey);
-    if (readout) {
-      readout.textContent = normalizedColor.toUpperCase();
-    }
-  });
-
-  if (typeof shaderRenderNow === "function") {
-    shaderRenderNow();
-  }
-};
 
 const formatTrackDuration = (durationMs) => {
   if (!Number.isFinite(durationMs) || durationMs <= 0) {
@@ -484,19 +385,6 @@ const initMusicFeed = () => {
   loadMusicFeed();
 };
 
-if (shaderKnobInputs.length || shaderColorInputs.length) {
-  syncShaderKnobState();
-
-  shaderKnobInputs.forEach((input) => {
-    input.addEventListener("input", syncShaderKnobState);
-    input.addEventListener("change", syncShaderKnobState);
-  });
-
-  shaderColorInputs.forEach((input) => {
-    input.addEventListener("input", syncShaderKnobState);
-    input.addEventListener("change", syncShaderKnobState);
-  });
-}
 
 const blogPosts = {
   "atmosphere-contrast": {
@@ -835,192 +723,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-const initShaderLab = () => {
-  if (!shaderCanvas) {
-    return;
-  }
-
-  const gl = shaderCanvas.getContext("webgl", { alpha: false, antialias: true });
-  if (!gl) {
-    if (shaderStage) {
-      shaderStage.classList.add("is-fallback");
-    }
-    return;
-  }
-
-  const vertexSource = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `;
-
-  const fragmentSource = `
-    precision mediump float;
-    uniform vec2 u_resolution;
-    uniform float u_time;
-    uniform float u_theme;
-    uniform float u_speed;
-    uniform float u_scale;
-    uniform float u_warp;
-    uniform float u_contrast;
-    uniform vec3 u_accent;
-    uniform vec3 u_pink;
-
-    void main() {
-      vec2 uv = (gl_FragCoord.xy / u_resolution.xy) * 2.0 - 1.0;
-      uv.x *= u_resolution.x / u_resolution.y;
-
-      float scale = max(0.25, u_scale);
-      vec2 suv = uv * scale;
-      float time = u_time * 0.42 * u_speed;
-      float ringFreq = 12.0 * (0.75 + u_warp * 0.45);
-      float waveX = 4.2 * (0.7 + u_warp * 0.3);
-      float waveY = 6.0 * (0.6 + u_warp * 0.4);
-      float rings = sin(length(suv) * ringFreq - time * 3.0);
-      float waves = sin((suv.x * waveX + time) + sin(suv.y * waveY - time * 1.8));
-      float pulse = sin(time * 2.5 + length(suv) * 9.0);
-      float glow = 0.5 + 0.5 * (rings * 0.55 + waves * 0.3 + pulse * 0.25);
-      glow = clamp((glow - 0.5) * u_contrast + 0.5, 0.0, 1.0);
-
-      vec3 darkA = vec3(0.06, 0.10, 0.22);
-      vec3 darkB = vec3(0.62, 0.35, 0.84);
-      vec3 darkC = vec3(0.10, 0.72, 0.88);
-
-      vec3 lightA = vec3(0.84, 0.90, 1.00);
-      vec3 lightB = vec3(0.50, 0.66, 0.95);
-      vec3 lightC = vec3(0.89, 0.60, 0.93);
-
-      vec3 paletteA = mix(darkA, lightA, u_theme);
-      vec3 paletteB = mix(darkB, lightB, u_theme);
-      paletteB = mix(paletteB, u_pink, 0.72);
-      vec3 paletteC = mix(darkC, lightC, u_theme);
-      paletteC = mix(paletteC, u_accent, 0.42);
-
-      vec3 color = mix(paletteA, paletteB, glow);
-      float paletteDrift = 0.5 + 0.5 * sin(time * 0.9 + length(suv) * 6.0 + waves * 0.7);
-      color = mix(color, paletteC, paletteDrift);
-      float accentWave = 0.5 + 0.5 * sin(time * 1.4 + rings * 2.0 + waves * 1.2);
-      float accentMix = (0.18 + glow * 0.22) * accentWave;
-      color = mix(color, u_accent, accentMix);
-
-      gl_FragColor = vec4(color, 1.0);
-    }
-  `;
-
-  const compileShader = (type, source) => {
-    const shader = gl.createShader(type);
-    if (!shader) {
-      return null;
-    }
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      gl.deleteShader(shader);
-      return null;
-    }
-    return shader;
-  };
-
-  const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
-  const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
-  if (!vertexShader || !fragmentShader) {
-    if (shaderStage) {
-      shaderStage.classList.add("is-fallback");
-    }
-    return;
-  }
-
-  const program = gl.createProgram();
-  if (!program) {
-    if (shaderStage) {
-      shaderStage.classList.add("is-fallback");
-    }
-    return;
-  }
-
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    if (shaderStage) {
-      shaderStage.classList.add("is-fallback");
-    }
-    return;
-  }
-
-  const positionLocation = gl.getAttribLocation(program, "a_position");
-  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-  const timeLocation = gl.getUniformLocation(program, "u_time");
-  const themeLocation = gl.getUniformLocation(program, "u_theme");
-  const speedLocation = gl.getUniformLocation(program, "u_speed");
-  const scaleLocation = gl.getUniformLocation(program, "u_scale");
-  const warpLocation = gl.getUniformLocation(program, "u_warp");
-  const contrastLocation = gl.getUniformLocation(program, "u_contrast");
-  const accentLocation = gl.getUniformLocation(program, "u_accent");
-  const pinkLocation = gl.getUniformLocation(program, "u_pink");
-
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-    gl.STATIC_DRAW,
-  );
-
-  const resizeCanvas = () => {
-    const dpr = window.devicePixelRatio || 1;
-    const width = Math.floor(shaderCanvas.clientWidth * dpr);
-    const height = Math.floor(shaderCanvas.clientHeight * dpr);
-    if (shaderCanvas.width !== width || shaderCanvas.height !== height) {
-      shaderCanvas.width = width;
-      shaderCanvas.height = height;
-      gl.viewport(0, 0, width, height);
-    }
-  };
-
-  const render = (elapsedMs) => {
-    resizeCanvas();
-    const timeSeconds = elapsedMs * 0.001;
-    const isLightTheme = document.body.classList.contains("light") ? 1 : 0;
-
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-    gl.uniform2f(resolutionLocation, shaderCanvas.width, shaderCanvas.height);
-    gl.uniform1f(timeLocation, timeSeconds);
-    gl.uniform1f(themeLocation, isLightTheme);
-    gl.uniform1f(speedLocation, clamp(shaderKnobState.speed, 0.0, 2.0));
-    gl.uniform1f(scaleLocation, clamp(shaderKnobState.scale, 0.6, 1.8));
-    gl.uniform1f(warpLocation, clamp(shaderKnobState.warp, 0.0, 2.0));
-    gl.uniform1f(contrastLocation, clamp(shaderKnobState.contrast, 0.5, 1.5));
-    gl.uniform3f(accentLocation, shaderColorState.accent.rgb[0], shaderColorState.accent.rgb[1], shaderColorState.accent.rgb[2]);
-    gl.uniform3f(pinkLocation, shaderColorState.pink.rgb[0], shaderColorState.pink.rgb[1], shaderColorState.pink.rgb[2]);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-  };
-
-  shaderRenderNow = () => {
-    render(window.performance.now());
-  };
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (reducedMotion) {
-    render(0);
-    window.addEventListener("resize", () => render(0));
-    return;
-  }
-
-  const loop = (elapsedMs) => {
-    render(elapsedMs);
-    window.requestAnimationFrame(loop);
-  };
-
-  window.addEventListener("resize", resizeCanvas);
-  window.requestAnimationFrame(loop);
-};
 
 const setTheme = (theme) => {
   const isLight = theme === "light";
@@ -1083,7 +785,6 @@ if (themeToggle) {
 }
 
 initializeTheme();
-initShaderLab();
 initMusicFeed();
 syncHeaderOffset();
 updateHeaderStuckState();
