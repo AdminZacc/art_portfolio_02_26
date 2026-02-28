@@ -8,11 +8,9 @@
 - Expanded music section into a compact right-side dock with responsive mobile behavior.
 - Added shared in-page music player behavior and compact playlist interactions.
 - Updated background particle visibility and loader compatibility.
-- Chosen auth direction: Cloudflare Access (Zero Trust) with setup steps documented in `README.md`.
 
 ## Notes
-- Access auth is configured at the Cloudflare edge/dashboard level, not in-site login UI.
-- If you later need user-specific app sessions (beyond edge gating), pair Access with Worker session logic.
+- Removed Cloudflare-specific UI/docs additions.
 
 ## Date
 - 2026-02-25
